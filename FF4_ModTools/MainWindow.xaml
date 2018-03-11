@@ -44,22 +44,22 @@
 
             <TreeView Grid.Row="0" x:Name="FileTree" Grid.Column="0" AllowDrop="True" Drop="FileTree_Drop"/>
             
-            <ListView Name="PropertyListView" Grid.Row="2" IsHitTestVisible="False">
+            <ListView x:Name="PropertyListView" Grid.Row="2" IsHitTestVisible="False">
                 <StackPanel Orientation="Horizontal">
                     <Label>File Name: </Label>
-                    <Label Name="PropertyFileName"></Label>
+                    <Label x:Name="PropertyFileName"></Label>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal">
                     <Label>Offset: </Label>
-                    <Label Name="PropertyOffset"></Label>
+                    <Label x:Name="PropertyOffset"></Label>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal">
                     <Label>Size: </Label>
-                    <Label Name="PropertySize"></Label>
+                    <Label x:Name="PropertySize"></Label>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal">
                     <Label>Type:</Label>
-                    <Label Name="PropertyType"></Label>
+                    <Label x:Name="PropertyType"></Label>
                 </StackPanel>
             </ListView>
 
@@ -67,7 +67,5 @@
             <Canvas Grid.RowSpan="3" Grid.Column="2" Background="White">
             </Canvas>
         </Grid>
-
-
     </Grid>
 </Window>

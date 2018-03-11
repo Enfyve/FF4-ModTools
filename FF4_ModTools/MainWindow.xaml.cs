@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
@@ -13,7 +14,7 @@ namespace FF4_ModTools
     /// </summary>
     public partial class MainWindow : Window
     {
-        private void OpenFileAsync(object sender, string targetFile)
+        private void OpenFileAsync(string targetFile)
         {
             // Open file for reading TODO 
             BinaryReader br = new BinaryReader(File.OpenRead(targetFile));
@@ -117,21 +118,27 @@ namespace FF4_ModTools
 
         private void FileTree_Drop(object sender, DragEventArgs e)
         {
+            string[] fileDrop;
+            
             if (e.Data.GetDataPresent(DataFormats.FileDrop))
-                OpenFileAsync(sender, 
-                    (e.Data.GetData(DataFormats.FileDrop) as string[])[0]);
+            {
+                fileDrop = (e.Data.GetData(DataFormats.FileDrop) as string[]);
+                OpenFileAsync(fileDrop[0]);
+            }
+                
         }
-
-
-
+        
 
         #region File Menu Events
 
         private void OpenCommand_Executed(object sender, System.Windows.Input.ExecutedRoutedEventArgs e)
         {
-            if (((App)Application.Current).FileDialog.ShowDialog() == true)
-            {
+            OpenFileDialog dialog = ((App)Application.Current).FileDialog;
 
+            if (dialog.ShowDialog() == true)
+            {
+                // TODO: Support multiple files
+                OpenFileAsync(dialog.FileName);
             }
         }
 

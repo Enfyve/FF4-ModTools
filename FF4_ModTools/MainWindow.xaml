@@ -63,7 +63,7 @@
                 </StackPanel>
             </ListView>
 
-            <GridSplitter Grid.RowSpan="3" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" Width="5" ResizeDirection="Columns"/>
+            <GridSplitter Grid.RowSpan="3" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" Width="10" ResizeDirection="Columns"/>
             <Canvas Grid.RowSpan="3" Grid.Column="2" Background="White">
             </Canvas>
         </Grid>

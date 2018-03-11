@@ -53,9 +53,7 @@ namespace FF4_ModTools
             int parentFileIndex = (int)(e.Argument as List<object>)[0];
             MASSFile file = (MASSFile)(e.Argument as List<object>)[1];
             
-            // Instantiate progress state variables
             int progressPercentage = 0;
-            List<object> progressState = new List<object> { parentFileIndex, null, null};
 
             // Loop through all subfiles
             for (int i = 0; i < file.SubFileCount; i++)
@@ -63,24 +61,21 @@ namespace FF4_ModTools
                 // Recalculate current progress percent
                 progressPercentage = Convert.ToInt32(((double)i / file.SubFileCount) * 100);
 
-                // Update progressState with the new Item's DataContext and Header values
-                progressState[1] = i;
-                progressState[2] = file.SubFiles[i].FileName;
-                
                 // Report Progress
+                List<object> progressState = new List<object> { parentFileIndex, i, file.SubFiles[i].FileName };                
                 (sender as BackgroundWorker).ReportProgress(progressPercentage, progressState);
                 
                 // Sleep, sweet summer child
                 Thread.Sleep(1);
             }
 
-            e.Result = progressState[0];
+            e.Result = parentFileIndex;
         }
 
         void Worker_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
             // Get State parameters
-            List<object> userState = (List<object>)e.UserState;
+            List<object> userState = new List<object>((IEnumerable<object>)e.UserState);
             int parentIndex = (int)userState[0];
             int childContext = (int)userState[1];
             string childHeader = (string)userState[2];

@@ -30,7 +30,7 @@ namespace FF4_ModTools
             int parentFileIndex = FileTree.Items.Add(new TreeViewItem
             {
                 DataContext = file,
-                Header = file.Name,
+                Header = $"{file.Name} ({file.SubFileCount} files)",
                 IsExpanded = true
             });
 

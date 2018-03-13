@@ -43,24 +43,14 @@
             </Grid.RowDefinitions>
 
             <TreeView Grid.Row="0" x:Name="FileTree" Grid.Column="0" AllowDrop="True" Drop="FileTree_Drop"/>
-            
-            <ListView x:Name="PropertyListView" Grid.Row="2" IsHitTestVisible="False">
-                <StackPanel Orientation="Horizontal">
-                    <Label>File Name: </Label>
-                    <Label x:Name="PropertyFileName"></Label>
-                </StackPanel>
-                <StackPanel Orientation="Horizontal">
-                    <Label>Offset: </Label>
-                    <Label x:Name="PropertyOffset"></Label>
-                </StackPanel>
-                <StackPanel Orientation="Horizontal">
-                    <Label>Size: </Label>
-                    <Label x:Name="PropertySize"></Label>
-                </StackPanel>
-                <StackPanel Orientation="Horizontal">
-                    <Label>Type:</Label>
-                    <Label x:Name="PropertyType"></Label>
-                </StackPanel>
+
+            <ListView x:Name="PropertyListView" Grid.Row="2">
+                <ListView.View>
+                    <GridView AllowsColumnReorder="False" >
+                        <GridViewColumn DisplayMemberBinding="{Binding Key}"/>
+                        <GridViewColumn DisplayMemberBinding="{Binding Value}"/>
+                    </GridView>
+                </ListView.View>
             </ListView>
 
             <GridSplitter Grid.RowSpan="3" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" Width="10" ResizeDirection="Columns"/>

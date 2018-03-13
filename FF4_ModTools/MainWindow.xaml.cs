@@ -16,6 +16,9 @@ namespace FF4_ModTools
     {
         private void OpenFileAsync(string targetFile)
         {
+            // Clean up PropertyListView items for later
+            PropertyListView.Items.Clear();
+
             // Open file for reading TODO 
             BinaryReader br = new BinaryReader(File.OpenRead(targetFile));
 
@@ -98,12 +101,21 @@ namespace FF4_ModTools
         private void SubFile_Selected(object sender, RoutedEventArgs e)
         {
             TreeViewItem item = (TreeViewItem)sender;
-            MASSFile file = (MASSFile)(item.Parent as TreeViewItem).DataContext;
 
-            PropertyFileName.Content = item.Header;
-            PropertyOffset.Content = file.SubFiles[(int)item.DataContext].Offset;
-            PropertySize.Content = file.SubFiles[(int)item.DataContext].Size;
-            PropertyType.Content = file.SubFiles[(int)item.DataContext].GetInternalType();
+            MASSSubFile _sf = ((MASSFile)((TreeViewItem)item.Parent).DataContext).SubFiles[(int)item.DataContext];
+
+            PropertyListView.Items.Clear();
+            PropertyListView.Items.Add(new ListViewItem{
+                Content = new KeyValuePair<string, object>("Name", item.Header)});
+
+            PropertyListView.Items.Add(new ListViewItem {
+                Content = new KeyValuePair<string, object>("Offset", _sf.Offset)});
+
+            PropertyListView.Items.Add(new ListViewItem {
+                Content = new KeyValuePair<string, object>("Size", _sf.Size)});
+
+            PropertyListView.Items.Add(new ListViewItem {
+                Content = new KeyValuePair<string, object>("Format", _sf.GetInternalType())});
         }
 
         public MainWindow()

@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-namespace FF4_ModTools
+namespace FF4_ModTools.FileFormats
 {
 
-    public class MASSSubFile
+    public sealed class MASSSubFile
     {
         public static readonly short NameMaxLength = 32;    // Max length of file name
         public static readonly char PaddingChar = '\x00';   // Byte to pad the remaining space with
@@ -36,7 +36,7 @@ namespace FF4_ModTools
 
             return extension;
         }
-        
+
     }
 
     public struct MASSHeader
@@ -62,12 +62,8 @@ namespace FF4_ModTools
         private UInt32 fileCount;
     }
 
-    public class MASSFile
+    public sealed class MASSFile : FF4Nitro
     {
-        public string Name
-        {
-            get => this.fileName;
-        }
         public int BaseOffset
         {
             get => this.header.Size;
@@ -77,11 +73,11 @@ namespace FF4_ModTools
             get => this.header.FileCount;
         }
         public List<MASSSubFile> SubFiles;
-
-        private string fileName;
+        
         private MASSHeader header;
-
-        public static MASSFile FromBinaryReader (ref BinaryReader reader)
+        
+        public override FF4Nitro ReadFromBinary(ref BinaryReader br) => FromBinaryReader(ref br);
+        public static new MASSFile FromBinaryReader(ref BinaryReader reader)
         {
             char[] readerMagic = reader.ReadChars(4);
 
@@ -97,7 +93,7 @@ namespace FF4_ModTools
                 fileName = new FileInfo((reader.BaseStream as FileStream).Name).Name,
                 SubFiles = new List<MASSSubFile>()
             };
-            
+
             for (int i = 0; i < file.SubFileCount; i++)
             {
                 file.SubFiles.Add(new MASSSubFile
@@ -125,6 +121,5 @@ namespace FF4_ModTools
 
             return file;
         }
-        
     }
 }

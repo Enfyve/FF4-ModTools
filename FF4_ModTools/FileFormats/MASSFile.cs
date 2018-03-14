@@ -18,6 +18,11 @@ namespace FF4_ModTools.FileFormats
             get => this.fileName.TrimEnd('\x00');
             set => this.fileName = value.PadRight(NameMaxLength, PaddingChar);
         }
+        public string Extension
+        {
+            get => this.FileName.Substring(this.FileName.IndexOf('.') + 1);
+        }
+
         public byte[] FileData;
 
         private string fileName;
@@ -64,14 +69,8 @@ namespace FF4_ModTools.FileFormats
 
     public sealed class MASSFile : FF4Nitro
     {
-        public int BaseOffset
-        {
-            get => this.header.Size;
-        }
-        public UInt32 SubFileCount
-        {
-            get => this.header.FileCount;
-        }
+        public int BaseOffset { get => this.header.Size; }
+        public UInt32 SubFileCount { get => this.header.FileCount; }
         public List<MASSSubFile> SubFiles;
         
         private MASSHeader header;

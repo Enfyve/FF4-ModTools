@@ -36,6 +36,9 @@ namespace FF4_ModTools
                 IsExpanded = true
             });
 
+            ((TreeViewItem)FileTree.Items[parentFileIndex]).Selected += TreeViewFile_Selected;
+
+
             // Create a new BackgroundWorker for populating FileTree
             BackgroundWorker worker = new BackgroundWorker { WorkerReportsProgress = true };
             worker.DoWork += Worker_DoWork;
@@ -48,7 +51,7 @@ namespace FF4_ModTools
                 file
             });
         }
-
+        
         void Worker_DoWork (object sender, DoWorkEventArgs e)
         {
             // Retrieve arguments
@@ -91,9 +94,34 @@ namespace FF4_ModTools
 
         private void Worker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            foreach (TreeViewItem child in ((TreeViewItem)FileTree.Items[(int)e.Result]).Items)
+            var parent = ((TreeViewItem)FileTree.Items[(int)e.Result]);
+            foreach (TreeViewItem child in parent.Items)
             {
                 child.Selected += SubFile_Selected;
+            }
+
+            // Initialize PropertyViewItemList with the parent file's data
+            GeneratePropertyViewItems(new List<KeyValuePair<string, object>>
+            {
+                new KeyValuePair<string, object>("Name", parent.Header),
+                new KeyValuePair<string, object>("File Count", ((MASSFile)parent.DataContext).SubFileCount),
+                new KeyValuePair<string, object>("First File", ((MASSFile)parent.DataContext).BaseOffset)
+            });
+        }
+        
+        private void TreeViewFile_Selected(object sender, RoutedEventArgs e)
+        {
+            var item = (TreeViewItem)sender;
+            var context = item.DataContext;
+            
+            if (context.GetType() == typeof(MASSFile))
+            {
+                GeneratePropertyViewItems(new List<KeyValuePair<string, object>>
+                {
+                    new KeyValuePair<string, object>("Name", item.Header),
+                    new KeyValuePair<string, object>("File Count", ((MASSFile)context).SubFileCount),
+                    new KeyValuePair<string, object>("First File", ((MASSFile)context).BaseOffset)
+                });
             }
         }
 
@@ -108,18 +136,28 @@ namespace FF4_ModTools
             // Read selected file and try to create a bitmap from it (for png files)
             // ImagePreview.Source = BitmapFrame.Create(new MemoryStream(_sf.FileData, false));
 
+
+            GeneratePropertyViewItems(new List<KeyValuePair<string, object>>
+            {
+                new KeyValuePair<string, object>("Name", item.Header),
+                new KeyValuePair<string, object>("Offset", _sf.Offset),
+                new KeyValuePair<string, object>("Size", _sf.Size),
+                new KeyValuePair<string, object>("Format", _sf.GetInternalType()),
+            });
+            e.Handled = true;
+        }
+
+        private void GeneratePropertyViewItems(List<KeyValuePair<string, object>> listViewItems)
+        {
             PropertyListView.Items.Clear();
-            PropertyListView.Items.Add(new ListViewItem{
-                Content = new KeyValuePair<string, object>("Name", item.Header)});
 
-            PropertyListView.Items.Add(new ListViewItem {
-                Content = new KeyValuePair<string, object>("Offset", _sf.Offset)});
-
-            PropertyListView.Items.Add(new ListViewItem {
-                Content = new KeyValuePair<string, object>("Size", _sf.Size)});
-
-            PropertyListView.Items.Add(new ListViewItem {
-                Content = new KeyValuePair<string, object>("Format", _sf.GetInternalType())});
+            foreach (KeyValuePair<string, object> k in listViewItems)
+            {
+                PropertyListView.Items.Add(new ListViewItem
+                {
+                    Content = k
+                });
+            }
         }
 
         public MainWindow()

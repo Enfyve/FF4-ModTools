@@ -54,7 +54,8 @@
             </ListView>
 
             <GridSplitter Grid.RowSpan="3" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" Width="10" ResizeDirection="Columns"/>
-            <Canvas Grid.RowSpan="3" Grid.Column="2" Background="White">
+            <Canvas x:Name="PreviewCanvas" Grid.RowSpan="3" Grid.Column="2" Background="White">
+                <Image x:Name="ImagePreview" Height="100" Width="100" Canvas.Left="10" Canvas.Top="10"/>
             </Canvas>
         </Grid>
     </Grid>

@@ -6,6 +6,8 @@ using System.IO;
 using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media.Imaging;
+using FF4_ModTools.FileFormats;
 
 namespace FF4_ModTools
 {
@@ -14,16 +16,13 @@ namespace FF4_ModTools
     /// </summary>
     public partial class MainWindow : Window
     {
-        private void OpenFileAsync(string targetFile)
+        private void PopulateAsync(string targetFile)
         {
             // Clean up PropertyListView items for later
             PropertyListView.Items.Clear();
-
-            // Open file for reading TODO 
-            BinaryReader br = new BinaryReader(File.OpenRead(targetFile));
-
-            // Create MASSFile object from BinaryReader stream
-            MASSFile file = MASSFile.FromBinaryReader(ref br);
+            
+            // TODO: Don't assume type MASSFile
+            MASSFile file = FileHandler.Open<MASSFile>(targetFile);
 
             // Clear Tree of previous files 
             // TODO: remove this for multi-file support
@@ -104,6 +103,11 @@ namespace FF4_ModTools
 
             MASSSubFile _sf = ((MASSFile)((TreeViewItem)item.Parent).DataContext).SubFiles[(int)item.DataContext];
 
+            // TODO: Verify file type, and display in PreviewCanvas
+
+            // Read selected file and try to create a bitmap from it (for png files)
+            // ImagePreview.Source = BitmapFrame.Create(new MemoryStream(_sf.FileData, false));
+
             PropertyListView.Items.Clear();
             PropertyListView.Items.Add(new ListViewItem{
                 Content = new KeyValuePair<string, object>("Name", item.Header)});
@@ -130,7 +134,7 @@ namespace FF4_ModTools
             if (e.Data.GetDataPresent(DataFormats.FileDrop))
             {
                 fileDrop = (e.Data.GetData(DataFormats.FileDrop) as string[]);
-                OpenFileAsync(fileDrop[0]);
+                PopulateAsync(fileDrop[0]);
             }
                 
         }
@@ -145,7 +149,7 @@ namespace FF4_ModTools
             if (dialog.ShowDialog() == true)
             {
                 // TODO: Support multiple files
-                OpenFileAsync(dialog.FileName);
+                PopulateAsync(dialog.FileName);
             }
         }
 

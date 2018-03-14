@@ -16,11 +16,13 @@ namespace FF4_ModTools
     /// </summary>
     public partial class MainWindow : Window
     {
+        OpenFileDialog openDialog;
+
         private void PopulateAsync(string targetFile)
         {
             // Clean up PropertyListView items for later
             PropertyListView.Items.Clear();
-            
+
             // TODO: Don't assume type MASSFile
             MASSFile file = FileHandler.Open<MASSFile>(targetFile);
 
@@ -37,7 +39,7 @@ namespace FF4_ModTools
             });
 
             ((TreeViewItem)FileTree.Items[parentFileIndex]).Selected += TreeViewFile_Selected;
-
+            ((TreeViewItem)FileTree.Items[parentFileIndex]).ContextMenu = (ContextMenu)this.Resources["TreeViewItemContextMenu"];
 
             // Create a new BackgroundWorker for populating FileTree
             BackgroundWorker worker = new BackgroundWorker { WorkerReportsProgress = true };
@@ -51,13 +53,13 @@ namespace FF4_ModTools
                 file
             });
         }
-        
-        void Worker_DoWork (object sender, DoWorkEventArgs e)
+
+        void Worker_DoWork(object sender, DoWorkEventArgs e)
         {
             // Retrieve arguments
             int parentFileIndex = (int)(e.Argument as List<object>)[0];
             MASSFile file = (MASSFile)(e.Argument as List<object>)[1];
-            
+
             int progressPercentage = 0;
 
             // Loop through all subfiles
@@ -67,9 +69,9 @@ namespace FF4_ModTools
                 progressPercentage = Convert.ToInt32(((double)i / file.SubFileCount) * 100);
 
                 // Report Progress
-                List<object> progressState = new List<object> { parentFileIndex, i, file.SubFiles[i].FileName };                
+                List<object> progressState = new List<object> { parentFileIndex, i, file.SubFiles[i].FileName };
                 (sender as BackgroundWorker).ReportProgress(progressPercentage, progressState);
-                
+
                 // Sleep, sweet summer child
                 Thread.Sleep(1);
             }
@@ -86,10 +88,11 @@ namespace FF4_ModTools
             string childHeader = (string)userState[2];
 
             // Add state to FileTree parent as a new TreeViewItem
-            (FileTree.Items[parentIndex] as TreeViewItem).Items.Add(new TreeViewItem {
+            (FileTree.Items[parentIndex] as TreeViewItem).Items.Add(new TreeViewItem
+            {
                 DataContext = childContext,
                 Header = childHeader
-            });            
+            });
         }
 
         private void Worker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
@@ -98,6 +101,8 @@ namespace FF4_ModTools
             foreach (TreeViewItem child in parent.Items)
             {
                 child.Selected += SubFile_Selected;
+                child.ContextMenu = (ContextMenu)this.Resources["SubFileContextMenu"];
+                child.ContextMenuOpening += SubFile_ContextMenuOpening;
             }
 
             // Initialize PropertyViewItemList with the parent file's data
@@ -108,12 +113,17 @@ namespace FF4_ModTools
                 new KeyValuePair<string, object>("First File", ((MASSFile)parent.DataContext).BaseOffset)
             });
         }
-        
+
+        private void SubFile_ContextMenuOpening(object sender, ContextMenuEventArgs e)
+        {
+            ((TreeViewItem)sender).IsSelected = true;
+        }
+
         private void TreeViewFile_Selected(object sender, RoutedEventArgs e)
         {
             var item = (TreeViewItem)sender;
             var context = item.DataContext;
-            
+
             if (context.GetType() == typeof(MASSFile))
             {
                 GeneratePropertyViewItems(new List<KeyValuePair<string, object>>
@@ -163,31 +173,36 @@ namespace FF4_ModTools
         public MainWindow()
         {
             InitializeComponent();
+            
+            openDialog = new OpenFileDialog
+            {
+                Multiselect = false,
+                Filter = "Dat files (*.dat)|*.dat|All files (*.*)|*.*",
+                InitialDirectory = $@"{Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86)}\Steam\SteamApps\common\Final Fantasy IV\EXTRACTED_DATA\"
+            };
         }
 
         private void FileTree_Drop(object sender, DragEventArgs e)
         {
             string[] fileDrop;
-            
+
             if (e.Data.GetDataPresent(DataFormats.FileDrop))
             {
                 fileDrop = (e.Data.GetData(DataFormats.FileDrop) as string[]);
                 PopulateAsync(fileDrop[0]);
             }
-                
+
         }
-        
+
 
         #region File Menu Events
 
         private void OpenCommand_Executed(object sender, System.Windows.Input.ExecutedRoutedEventArgs e)
         {
-            OpenFileDialog dialog = ((App)Application.Current).FileDialog;
-
-            if (dialog.ShowDialog() == true)
+            if (openDialog.ShowDialog() == true)
             {
                 // TODO: Support multiple files
-                PopulateAsync(dialog.FileName);
+                PopulateAsync(openDialog.FileName);
             }
         }
 
@@ -200,12 +215,33 @@ namespace FF4_ModTools
         {
             Application.Current.Shutdown();
         }
-        
+
         private void CommandBinding_CanExecute(object sender, System.Windows.Input.CanExecuteRoutedEventArgs e)
         {
             e.CanExecute = true;
         }
-        
+
         #endregion
+
+        private void SubFileContextExport_Click(object sender, RoutedEventArgs e)
+        {
+            var item = (TreeViewItem)((ContextMenu)((MenuItem)sender).Parent).PlacementTarget;
+
+            int index = (int)item.DataContext;
+            var parent = (TreeViewItem)item.Parent;
+
+            var subFile = ((MASSFile)parent.DataContext).SubFiles[index];
+
+            SaveFileDialog saveDialog = new SaveFileDialog
+            {
+                Filter = $"{subFile.FileName} | *.{subFile.Extension}",
+                FileName = subFile.FileName
+            };
+
+            if (saveDialog.ShowDialog() == true)
+            {
+                FileHandler.Save(saveDialog.FileName, subFile.FileData);
+            }
+        }
     }
 }

@@ -8,6 +8,21 @@
     <Window.CommandBindings>
         <CommandBinding Command="Open" CanExecute="CommandBinding_CanExecute" Executed="OpenCommand_Executed"/>
     </Window.CommandBindings>
+    <Window.Resources>
+        <ContextMenu x:Key="TreeViewItemContextMenu" >
+            <ContextMenu.Items>
+                <!--
+                    TODO: Add context menu items
+                    -->
+            </ContextMenu.Items>
+        </ContextMenu>
+        <ContextMenu x:Key="SubFileContextMenu" >
+            <ContextMenu.Items>
+                <MenuItem x:Name="SubFileContextExport" Header="Export" Click="SubFileContextExport_Click"></MenuItem>
+                <MenuItem Header="Replace"></MenuItem>
+            </ContextMenu.Items>
+        </ContextMenu>
+    </Window.Resources>
     <Grid>
         <Grid.Background>
             <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.ControlColorKey}}"/>

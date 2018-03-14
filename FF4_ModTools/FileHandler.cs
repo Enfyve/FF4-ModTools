@@ -19,5 +19,18 @@ namespace FF4_ModTools
             // Return new T created from specified Binary Reader
             return (T)(new T()).ReadFromBinary(ref br);
         }
+
+        public static bool Save(string name, byte[] data)
+        {
+            FileStream outStream = new FileStream(name, FileMode.OpenOrCreate, FileAccess.Write);
+
+            outStream.Write(data, 0, data.Length);
+
+            outStream.Flush();
+            outStream.Close();
+            outStream.Dispose();
+
+            return true;
+        }
     }
 }

@@ -8,6 +8,19 @@
     <Window.CommandBindings>
         <CommandBinding Command="Open" CanExecute="CommandBinding_CanExecute" Executed="OpenCommand_Executed"/>
     </Window.CommandBindings>
+    <Window.Resources>
+        <ContextMenu x:Key="TreeViewItemContextMenu" >
+            <ContextMenu.Items>
+                <MenuItem x:Name="ParentFileRepack" Header="Repack" Click="ParentFileRepack_Click"></MenuItem>
+            </ContextMenu.Items>
+        </ContextMenu>
+        <ContextMenu x:Key="SubFileContextMenu" >
+            <ContextMenu.Items>
+                <MenuItem x:Name="SubFileContextExport" Header="Export" Click="SubFileContextExport_Click"></MenuItem>
+                <MenuItem x:Name="SubFileContextReplace" Header="Replace" Click="SubFileContextReplace"></MenuItem>
+            </ContextMenu.Items>
+        </ContextMenu>
+    </Window.Resources>
     <Grid>
         <Grid.Background>
             <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.ControlColorKey}}"/>
@@ -43,28 +56,19 @@
             </Grid.RowDefinitions>
 
             <TreeView Grid.Row="0" x:Name="FileTree" Grid.Column="0" AllowDrop="True" Drop="FileTree_Drop"/>
-            
-            <ListView x:Name="PropertyListView" Grid.Row="2" IsHitTestVisible="False">
-                <StackPanel Orientation="Horizontal">
-                    <Label>File Name: </Label>
-                    <Label x:Name="PropertyFileName"></Label>
-                </StackPanel>
-                <StackPanel Orientation="Horizontal">
-                    <Label>Offset: </Label>
-                    <Label x:Name="PropertyOffset"></Label>
-                </StackPanel>
-                <StackPanel Orientation="Horizontal">
-                    <Label>Size: </Label>
-                    <Label x:Name="PropertySize"></Label>
-                </StackPanel>
-                <StackPanel Orientation="Horizontal">
-                    <Label>Type:</Label>
-                    <Label x:Name="PropertyType"></Label>
-                </StackPanel>
+
+            <ListView x:Name="PropertyListView" Grid.Row="2">
+                <ListView.View>
+                    <GridView AllowsColumnReorder="False" >
+                        <GridViewColumn DisplayMemberBinding="{Binding Key}"/>
+                        <GridViewColumn DisplayMemberBinding="{Binding Value}"/>
+                    </GridView>
+                </ListView.View>
             </ListView>
 
             <GridSplitter Grid.RowSpan="3" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" Width="10" ResizeDirection="Columns"/>
-            <Canvas Grid.RowSpan="3" Grid.Column="2" Background="White">
+            <Canvas x:Name="PreviewCanvas" Grid.RowSpan="3" Grid.Column="2" Background="White">
+                <Image x:Name="ImagePreview" Height="100" Width="100" Canvas.Left="10" Canvas.Top="10"/>
             </Canvas>
         </Grid>
     </Grid>

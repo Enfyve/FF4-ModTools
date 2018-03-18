@@ -5,101 +5,50 @@ using System.Linq;
 
 namespace FF4_ModTools.FileFormats
 {
-
-    public sealed class MASSSubFile
+    public sealed class MASSFile : NitroFile
     {
-        public static readonly short NameMaxLength = 32;    // Max length of file name
-        public static readonly char PaddingChar = '\x00';   // Byte to pad the remaining space with
+        new public static readonly string Magic = "SSAM";
+        public const byte HeaderOffset = 8;
+        public const byte HeaderItemSize = 40;
 
-        public UInt32 Offset;
-        public UInt32 Size;
-        public string FileName
+        public uint FileOffset { get => headerSize; }
+        public uint SubFileCount
         {
-            get => this.fileName.TrimEnd('\x00');
-            set => this.fileName = value.PadRight(NameMaxLength, PaddingChar);
-        }
-        public string Extension
-        {
-            get => this.FileName.Substring(this.FileName.IndexOf('.') + 1);
-        }
-
-        public byte[] FileData;
-
-        private string fileName;
-
-        // TODO: convert to readonly property that is set when FileName is set.
-        public string GetInternalType()
-        {
-            string extension = FileName.TrimEnd(".lz".ToCharArray());
-            extension = extension.Substring(extension.LastIndexOf('.') + 1).ToUpper();
-
-            if (extension == "NCGR" || extension == "NCBR")
-            {
-                // TODO: Check FileData for PNG Magic
-                // If identified as PNG, return "PNG Image"
-            }
-
-            return extension;
-        }
-
-    }
-
-    public struct MASSHeader
-    {
-        public static readonly char[] Magic = { 'S', 'S', 'A', 'M' };
-
-        public UInt32 FileCount
-        {
-            get => this.fileCount;
+            get => subFileCount;
             set
             {
-                this.size = 40 * (int)value + 8;
-                this.fileCount = value;
+                headerSize = HeaderOffset + (HeaderItemSize * value);
+                subFileCount = value;
             }
         }
-
-        public int Size
-        {
-            get => this.size;
-        }
-
-        private int size;
-        private UInt32 fileCount;
-    }
-
-    public sealed class MASSFile : FF4Nitro
-    {
-        public int BaseOffset { get => this.header.Size; }
-        public UInt32 SubFileCount { get => this.header.FileCount; }
         public List<MASSSubFile> SubFiles;
         
-        private MASSHeader header;
+        private uint headerSize;
+        private uint subFileCount;
         
-        public override FF4Nitro ReadFromBinary(ref BinaryReader br) => FromBinaryReader(ref br);
-        public static new MASSFile FromBinaryReader(ref BinaryReader reader)
+        public override NitroFile FromBinaryReader(BinaryReader reader)
         {
-            char[] readerMagic = reader.ReadChars(4);
+            string readerMagic = new string(reader.ReadChars(4));
 
-            if (!MASSHeader.Magic.SequenceEqual(readerMagic))
-                throw new FileFormatException($"Expected Magic: {new string(MASSHeader.Magic)}, Found: {new string(readerMagic)}");
+            if (Magic != readerMagic)
+                throw new FileFormatException($"Expected Magic: \"{Magic}\", Found: \"{readerMagic}\"");
 
-            MASSFile file = new MASSFile()
+            subFileCount = reader.ReadUInt32();
+            headerSize = HeaderOffset + (HeaderItemSize * subFileCount);
+            fileName = new FileInfo((reader.BaseStream as FileStream).Name).Name;
+            SubFiles = new List<MASSSubFile>();
+
+            for (int i = 0; i < subFileCount; i++)
             {
-                header = new MASSHeader
+                SubFiles.Add(new MASSSubFile
                 {
-                    FileCount = reader.ReadUInt32()
-                },
-                fileName = new FileInfo((reader.BaseStream as FileStream).Name).Name,
-                SubFiles = new List<MASSSubFile>()
-            };
-
-            for (int i = 0; i < file.SubFileCount; i++)
-            {
-                file.SubFiles.Add(new MASSSubFile
-                {
-                    Offset = reader.ReadUInt32(),
-                    Size = reader.ReadUInt32(),
-                    FileName = new string(reader.ReadChars(MASSSubFile.NameMaxLength))
+                    Header = new MASSHeaderItem
+                    {
+                        Offset = reader.ReadUInt32(),
+                        Size = reader.ReadUInt32(),
+                        Name = new string(reader.ReadChars(MASSHeaderItem.NameMaxLength))
+                    }
+                    
                 });
 
                 // TODO: Read subfile bytes as raw data and set FileData from there instead of using
@@ -109,16 +58,31 @@ namespace FF4_ModTools.FileFormats
                 long pos = reader.BaseStream.Position;
 
                 // Seek to subfile offset
-                reader.BaseStream.Seek(file.BaseOffset + file.SubFiles[i].Offset, SeekOrigin.Begin);
+                reader.BaseStream.Seek(FileOffset + SubFiles[i].Header.Offset, SeekOrigin.Begin);
 
                 // Copy subfile to FileData
-                file.SubFiles[i].FileData = (reader.ReadBytes((Int32)file.SubFiles[i].Size));
+                SubFiles[i].Data = (reader.ReadBytes((int)SubFiles[i].Header.Size));
 
                 // Return to previous position
                 reader.BaseStream.Seek(pos, SeekOrigin.Begin);
             }
 
-            return file;
+            return this;
+        }
+
+        internal void SetDirty(int index)
+        {
+            SubFiles
+                .Where((x, i) => i >= index)
+                .All(x => x.Header.Dirty = true);
+        }
+
+        internal void RecalculateHeader() => throw new NotImplementedException();
+
+        internal byte[] GetData()
+        {
+            RecalculateHeader();
+            return null;
         }
     }
 }

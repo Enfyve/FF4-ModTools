@@ -11,15 +11,13 @@
     <Window.Resources>
         <ContextMenu x:Key="TreeViewItemContextMenu" >
             <ContextMenu.Items>
-                <!--
-                    TODO: Add context menu items
-                    -->
+                <MenuItem x:Name="ParentFileRepack" Header="Repack" Click="ParentFileRepack_Click"></MenuItem>
             </ContextMenu.Items>
         </ContextMenu>
         <ContextMenu x:Key="SubFileContextMenu" >
             <ContextMenu.Items>
                 <MenuItem x:Name="SubFileContextExport" Header="Export" Click="SubFileContextExport_Click"></MenuItem>
-                <MenuItem Header="Replace"></MenuItem>
+                <MenuItem x:Name="SubFileContextReplace" Header="Replace" Click="SubFileContextReplace"></MenuItem>
             </ContextMenu.Items>
         </ContextMenu>
     </Window.Resources>

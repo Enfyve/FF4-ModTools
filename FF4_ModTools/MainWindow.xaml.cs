@@ -23,6 +23,9 @@ namespace FF4_ModTools
             // Clean up PropertyListView items for later
             PropertyListView.Items.Clear();
 
+
+            //FileHandler.GetFormat(targetFile);
+            //XBNFile s = FileHandler.Open<XBNFile>(targetFile);
             // TODO: Don't assume type MASSFile
             MASSFile file = FileHandler.Open<MASSFile>(targetFile);
 
@@ -69,7 +72,7 @@ namespace FF4_ModTools
                 progressPercentage = Convert.ToInt32(((double)i / file.SubFileCount) * 100);
 
                 // Report Progress
-                List<object> progressState = new List<object> { parentFileIndex, i, file.SubFiles[i].FileName };
+                List<object> progressState = new List<object> { parentFileIndex, i, file.SubFiles[i].Header.Name };
                 (sender as BackgroundWorker).ReportProgress(progressPercentage, progressState);
 
                 // Sleep, sweet summer child
@@ -110,7 +113,7 @@ namespace FF4_ModTools
             {
                 new KeyValuePair<string, object>("Name", parent.Header),
                 new KeyValuePair<string, object>("File Count", ((MASSFile)parent.DataContext).SubFileCount),
-                new KeyValuePair<string, object>("First File", ((MASSFile)parent.DataContext).BaseOffset)
+                new KeyValuePair<string, object>("First File", ((MASSFile)parent.DataContext).FileOffset)
             });
         }
 
@@ -130,7 +133,7 @@ namespace FF4_ModTools
                 {
                     new KeyValuePair<string, object>("Name", item.Header),
                     new KeyValuePair<string, object>("File Count", ((MASSFile)context).SubFileCount),
-                    new KeyValuePair<string, object>("First File", ((MASSFile)context).BaseOffset)
+                    new KeyValuePair<string, object>("First File", ((MASSFile)context).FileOffset)
                 });
             }
         }
@@ -150,8 +153,8 @@ namespace FF4_ModTools
             GeneratePropertyViewItems(new List<KeyValuePair<string, object>>
             {
                 new KeyValuePair<string, object>("Name", item.Header),
-                new KeyValuePair<string, object>("Offset", _sf.Offset),
-                new KeyValuePair<string, object>("Size", _sf.Size),
+                new KeyValuePair<string, object>("Relative Offset", _sf.Header.Offset),
+                new KeyValuePair<string, object>("Size", _sf.Header.Size),
                 new KeyValuePair<string, object>("Format", _sf.GetInternalType()),
             });
             e.Handled = true;
@@ -167,6 +170,12 @@ namespace FF4_ModTools
                 {
                     Content = k
                 });
+            }
+
+            foreach (GridViewColumn c in (PropertyListView.View as GridView).Columns)
+            {
+                c.Width = c.ActualWidth;    // First set to a different value
+                c.Width = Double.NaN;       // Then set it back to NaN for auto resizing
             }
         }
 
@@ -234,13 +243,51 @@ namespace FF4_ModTools
 
             SaveFileDialog saveDialog = new SaveFileDialog
             {
-                Filter = $"{subFile.FileName} | *.{subFile.Extension}",
-                FileName = subFile.FileName
+                Filter = $"{subFile.Name} | *.{subFile.Extension}",
+                FileName = subFile.Name
             };
 
             if (saveDialog.ShowDialog() == true)
             {
-                FileHandler.Save(saveDialog.FileName, subFile.FileData);
+                FileHandler.Save(saveDialog.FileName, subFile.Data);
+            }
+        }
+
+        private void ParentFileRepack_Click(object sender, RoutedEventArgs e)
+        {
+            var parent = (TreeViewItem)FileTree.Items[0];
+
+            MASSFile context = (MASSFile)parent.DataContext;
+
+            SaveFileDialog saveDialog = new SaveFileDialog
+            {
+                Filter = $"{context.Name} | *.*",
+                FileName = context.Name
+            };
+
+            if (saveDialog.ShowDialog() == true)
+            {
+                FileHandler.Save(saveDialog.FileName, context.GetData());
+            }
+
+            // FileHandler.Save(); ;
+        }
+
+        private void SubFileContextReplace(object sender, RoutedEventArgs e)
+        {
+            var item = (TreeViewItem)((ContextMenu)((MenuItem)sender).Parent).PlacementTarget;
+
+            int index = (int)item.DataContext;
+            var context = (MASSFile)((TreeViewItem)item.Parent).DataContext;
+
+            ref var subFiles = ref context.SubFiles;
+
+            openDialog.Filter = "All files (*.*)|*.*";
+
+            if (openDialog.ShowDialog() == true)
+            {
+                subFiles[index].ReplaceData(FileHandler.Open<MASSSubFile>(openDialog.FileName));
+                context.SetDirty(index);
             }
         }
     }

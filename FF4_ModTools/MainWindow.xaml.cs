@@ -290,5 +290,10 @@ namespace FF4_ModTools
                 context.SetDirty(index);
             }
         }
+        private void SetColor_Click(object sender, RoutedEventArgs e)
+        {
+            ColorPicker colorPicker = new ColorPicker();
+            colorPicker.ShowDialog();
+        }
     }
 }

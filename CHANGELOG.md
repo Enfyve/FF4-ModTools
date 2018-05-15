@@ -7,3 +7,6 @@
 
 - added base layout for UI editor
   > In order to modify UI colors and layout, the binary will need to be modified. This code will serve as the user friendly editor for patching the binary's UI.
+  
+- added first wiki page
+  > Honestly I just want to pad this file, it looks so empty.

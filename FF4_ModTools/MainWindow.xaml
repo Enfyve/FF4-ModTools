@@ -4,7 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
-        Title="FF4 Mod Tools" Height="640" MinWidth="800" Width="800" WindowStartupLocation="CenterOwner" Icon="Resources/Icon.ico">
+        Title="FF4 Mod Tools" Height="640" MinWidth="900" Width="900" WindowStartupLocation="CenterOwner" Icon="Resources/Icon.ico">
     <Window.CommandBindings>
         <CommandBinding Command="Open" CanExecute="CommandBinding_CanExecute" Executed="OpenCommand_Executed"/>
     </Window.CommandBindings>
@@ -43,33 +43,86 @@
             <StackPanel></StackPanel>
         </DockPanel>
 
-        <Grid Margin="10,10,10,10" Grid.Row="1">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition MinWidth="64"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="2*"/>
-            </Grid.ColumnDefinitions>
-            <Grid.RowDefinitions>
-                <RowDefinition MinHeight="128" Height="8*"/>
-                <RowDefinition Height="10" />
-                <RowDefinition MinHeight="64" Height="2.5*"/>
-            </Grid.RowDefinitions>
+        <TabControl Margin="10" Grid.Row="1">
+            <TabItem Header="Menu UI">
+                <Grid Grid.Row="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="2*"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="3*"/>
+                    </Grid.ColumnDefinitions>
+                    <Label HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="92" Content="Window Style"/>
+                    <ComboBox HorizontalAlignment="Left" Margin="107,12,0,0" VerticalAlignment="Top" Width="96" SelectedIndex="0">
+                        <ComboBoxItem Content="1"/>
+                        <ComboBoxItem Content="2"/>
+                        <ComboBoxItem Content="3"/>
+                        <ComboBoxItem Content="4"/>
+                        <ComboBoxItem Content="5"/>
+                        <ComboBoxItem Content="6"/>
+                    </ComboBox>
 
-            <TreeView Grid.Row="0" x:Name="FileTree" Grid.Column="0" AllowDrop="True" Drop="FileTree_Drop"/>
+                    <ListBox VerticalAlignment="Top" Margin="10,40.96,10,0" Height="100"/>
+                    <Canvas Grid.Column="2" Height="320" Width="480" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,10,0,0">
+                        <Canvas.Background>
+                            <ImageBrush ImageSource="Resources/Default UI/wallpaper3d_00.PNG" ViewportUnits="Absolute" Viewport="0,128,256,256" Stretch="None" TileMode="Tile"/>
+                        </Canvas.Background>
 
-            <ListView x:Name="PropertyListView" Grid.Row="2">
-                <ListView.View>
-                    <GridView AllowsColumnReorder="False" >
-                        <GridViewColumn DisplayMemberBinding="{Binding Key}"/>
-                        <GridViewColumn DisplayMemberBinding="{Binding Value}"/>
-                    </GridView>
-                </ListView.View>
-            </ListView>
+                    </Canvas>
+                    <GridSplitter Grid.RowSpan="3" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" Width="5" Margin="2,0"/>
+                    <Label HorizontalAlignment="Left" Margin="17.1,350,0,0" VerticalAlignment="Top" Width="93" Content="Colors" Grid.Column="2" FontWeight="Bold"/>
+                    <ListBox Grid.Column="2" HorizontalAlignment="Left" Margin="32,375,0,0" VerticalAlignment="Top" Width="144" Height="150.08" SelectedIndex="0">
+                        <ListBoxItem Content="Horizontal Gradient"/>
+                        <ListBoxItem Content="Vertical Gradient"/>
+                        <ListBoxItem Content="Button Gradient"/>
+                        <ListBoxItem Content="Button Hover Gradient"/>
+                        <ListBoxItem Content="Button Active Gradient"/>
+                    </ListBox>
 
-            <GridSplitter Grid.RowSpan="3" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" Width="10" ResizeDirection="Columns"/>
-            <Canvas x:Name="PreviewCanvas" Grid.RowSpan="3" Grid.Column="2" Background="White">
-                <Image x:Name="ImagePreview" Height="100" Width="100" Canvas.Left="10" Canvas.Top="10"/>
-            </Canvas>
-        </Grid>
+                    <Grid Grid.Column="2" Margin="361.8,375,17.1,10">
+                        <Grid.Background>
+                            <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                <GradientStop Color="Black" Offset="0"/>
+                                <GradientStop Color="White" Offset="1"/>
+                            </LinearGradientBrush>
+                        </Grid.Background>
+                    </Grid>
+                    <Slider HorizontalAlignment="Left" Margin="60,270.08,0,0" VerticalAlignment="Top" Width="229"/>
+                    <Button x:Name="Stop0" Grid.Column="2" Margin="192,376.96,157.4,125.84" Background="Red" Click="SetColor_Click" Template="{DynamicResource ButtonControlTemplate1}" Cursor="Hand"/>
+                    <Button x:Name="Stop1" Grid.Column="2" Margin="192,415.457,157.4,87.343" Background="#FFC90000" Click="SetColor_Click" Template="{DynamicResource ButtonControlTemplate1}" Cursor="Hand"/>
+                    <Button x:Name="Stop2" Grid.Column="2" Margin="192,453.955,157.4,48.845" Background="#FF680000" Click="SetColor_Click" Template="{DynamicResource ButtonControlTemplate1}" Cursor="Hand"/>
+                    <Button x:Name="Stop3" Grid.Column="2" Margin="192,492.8,157.4,10" Background="#FF250000" Click="SetColor_Click" Template="{DynamicResource ButtonControlTemplate1}" Cursor="Hand"/>
+                </Grid>
+            </TabItem>
+            <TabItem Header="File Browser">
+                <Grid Grid.Row="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition MinWidth="64"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="2*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition MinHeight="128" Height="8*"/>
+                        <RowDefinition Height="10" />
+                        <RowDefinition MinHeight="64" Height="2.5*"/>
+                    </Grid.RowDefinitions>
+
+                    <TreeView Grid.Row="0" x:Name="FileTree" Grid.Column="0" AllowDrop="True" Drop="FileTree_Drop" Margin="10,10,3,0"/>
+
+                    <ListView x:Name="PropertyListView" Grid.Row="2" Margin="10,0,3,10">
+                        <ListView.View>
+                            <GridView AllowsColumnReorder="False" >
+                                <GridViewColumn DisplayMemberBinding="{Binding Key}"/>
+                                <GridViewColumn DisplayMemberBinding="{Binding Value}"/>
+                            </GridView>
+                        </ListView.View>
+                    </ListView>
+
+                    <GridSplitter Margin="2,0" Grid.RowSpan="3" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" Width="5" ResizeDirection="Columns"/>
+                    <Canvas x:Name="PreviewCanvas" Grid.RowSpan="3" Grid.Column="2" Background="White" Margin="3,10,10,10">
+                        <Image x:Name="ImagePreview" Height="100" Width="100" Canvas.Left="10" Canvas.Top="10"/>
+                    </Canvas>
+                </Grid>
+            </TabItem>
+        </TabControl>
     </Grid>
 </Window>

@@ -1,8 +1,17 @@
 # FF4 Mod Tools
 
-   FF4MT will be a set of tools wrapped in a simple GUI for making edits to FF4's resources.
+   FF4MT will be a set of tools wrapped in a simple GUI for making edits to Final Fantasy 4 resources.
 
-## TODO
+   Currently, there is only a rudimentary layout with little actual functionality.
 
-- Finish writing readme
-- Add real file extraction/parsing
+## Planned Features
+
+- Unpack, Modify and Repack MASS Files (*.dat)
+- (De)Compress lz77 files
+- Modify UI Windows
+
+- More?
+
+## License
+
+[MIT](LICENSE)

@@ -20,8 +20,8 @@
                         </LinearGradientBrush>
                     </Canvas.Background>
                     <Canvas.Effect>
-                        <local:AdditiveBlendEffect>
-                            <local:AdditiveBlendEffect.Texture>
+                        <local:MultiplyBlendEffect>
+                            <local:MultiplyBlendEffect.Texture>
                                 <ImageBrush>
                                     <ImageBrush.ImageSource>
                                         <DrawingImage>
@@ -41,8 +41,8 @@
                                         </DrawingImage>
                                     </ImageBrush.ImageSource>
                                 </ImageBrush>
-                            </local:AdditiveBlendEffect.Texture>
-                        </local:AdditiveBlendEffect>
+                            </local:MultiplyBlendEffect.Texture>
+                        </local:MultiplyBlendEffect>
                     </Canvas.Effect>
                 </Canvas>
                 <Ellipse Name="ColorSelection" Canvas.Top="-6" Canvas.Left="-6" Width="12" Height="12" Stroke="#FF000000" IsHitTestVisible="False" StrokeThickness="1" />

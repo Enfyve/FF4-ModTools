@@ -5,16 +5,16 @@ using System.Windows.Media.Effects;
 
 namespace FF4_ModTools
 {
-    class AdditiveBlendEffect : ShaderEffect
+    class MultiplyBlendEffect : ShaderEffect
     {
-        static AdditiveBlendEffect()
+        static MultiplyBlendEffect()
         {
-            _pixelShader.UriSource = new Uri($"pack://application:,,,/{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name};component/Resources/AdditiveBlendEffect.ps");
+            _pixelShader.UriSource = new Uri($"pack://application:,,,/{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name};component/Resources/MultiplyBlendEffect.ps");
         }
 
         private static PixelShader _pixelShader = new PixelShader();
 
-        public AdditiveBlendEffect()
+        public MultiplyBlendEffect()
         {
             this.PixelShader = _pixelShader;
             UpdateShaderValue(InputProperty);
@@ -33,8 +33,8 @@ namespace FF4_ModTools
             set => SetValue(TextureProperty, value);
         }
 
-        public static readonly DependencyProperty InputProperty = RegisterPixelShaderSamplerProperty("Input", typeof(AdditiveBlendEffect), 0);
-        public static readonly DependencyProperty TextureProperty = RegisterPixelShaderSamplerProperty("Blend", typeof(AdditiveBlendEffect), 1);
+        public static readonly DependencyProperty InputProperty = RegisterPixelShaderSamplerProperty("Input", typeof(MultiplyBlendEffect), 0);
+        public static readonly DependencyProperty TextureProperty = RegisterPixelShaderSamplerProperty("Blend", typeof(MultiplyBlendEffect), 1);
     }
 
 }

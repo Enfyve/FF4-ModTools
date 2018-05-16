@@ -73,7 +73,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="AdditiveBlendEffect.cs" />
+    <Compile Include="MultiplyBlendEffect.cs" />
     <Compile Include="ColorPicker.xaml.cs">
       <DependentUpon>ColorPicker.xaml</DependentUpon>
     </Compile>
@@ -121,7 +121,7 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
-    <Resource Include="Resources\AdditiveBlendEffect.ps" />
+    <Resource Include="Resources\MultiplyBlendEffect.ps" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -151,7 +151,7 @@
     <Resource Include="Resources\Default UI\window_frame_00.PNG" />
   </ItemGroup>
   <ItemGroup>
-    <Effect Include="AdditiveBlendEffect.fx" />
+    <Effect Include="MultiplyBlendEffect.fx" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
